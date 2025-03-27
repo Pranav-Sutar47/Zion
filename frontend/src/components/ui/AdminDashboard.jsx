@@ -100,7 +100,7 @@ const AdminDashboard = () => {
       >
         <div className="p-5 border-b border-neutral-200 flex justify-between items-center">
           {isHovered && (
-            <h1 className="text-2xl font-bold text-black">Admin</h1>
+            <h1 className="text-2xl font-bold text-black">StateSent</h1>
           )}
         </div>
         
