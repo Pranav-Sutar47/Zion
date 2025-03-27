@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import Analysis from './Analysis'
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
 import Dashboard from './Dashboard';
@@ -199,17 +198,25 @@ const UsersContent = () => {
       setSuccess('')
   
       try {
-        const response = await axios.post('/api/admins', formData)
+        const url = String(import.meta.env.VITE_BASEURL)+'/addUser';
+        const response = await axios.post(url,formData);
+        console.log(response);
+
+        if (response.status === 201) {
         setSuccess('Admin created successfully!')
-        // Reset form after successful creation
+        }
+        else{
+          setError('Failed to create admin. Please try again.')
+        }
+      } catch (err) {
+        setError('Failed to create admin. Please try again.')
+        console.error(err)
+      }finally{
         setFormData({
           username: '',
           email: '',
           password: ''
         })
-      } catch (err) {
-        setError('Failed to create admin. Please try again.')
-        console.error(err)
       }
     }
   

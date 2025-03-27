@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react'
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
-const AnalyticsContent = () => {
+const AnalyticsContent = ({stats}) => {
+
+  console.log(stats);
   // State to store sentiment data
   const [sentimentData, setSentimentData] = useState([
-    { name: 'Positive', value: 400, color: '#10B981' },
-    { name: 'Neutral', value: 300, color: '#3B82F6' },
-    { name: 'Negative', value: 200, color: '#EF4444' }
+    { name: 'Positive', value:stats.positive, color: '#10B981' },
+    { name: 'Neutral', value: stats.neutral, color: '#3B82F6' },
+    { name: 'Negative', value: stats.negative, color: '#EF4444' }
   ])
 
   // State for additional metrics
   const [metrics, setMetrics] = useState({
-    totalReviews: 900,
+    totalReviews: stats.total_tweets,
     averageSentiment: 0,
     mostFrequentSentiment: 'Positive'
   })
@@ -20,12 +22,6 @@ const AnalyticsContent = () => {
   useEffect(() => {
     const fetchSentimentData = async () => {
       try {
-        // Uncomment and modify when you have a real API endpoint
-        // const response = await fetch('YOUR_API_ENDPOINT');
-        // const data = await response.json();
-        // setSentimentData(data);
-
-        // Calculate additional metrics
         const total = sentimentData.reduce((sum, item) => sum + item.value, 0)
         const mostFrequent = sentimentData.reduce((prev, current) => 
           (prev.value > current.value) ? prev : current
@@ -59,13 +55,11 @@ const AnalyticsContent = () => {
 
   return (
     <div>
-      <h2 className="text-3xl font-bold mb-6">Analytics Dashboard</h2>
       <div className="grid grid-cols-2 gap-6">
         <div 
           className="bg-neutral-100 p-6 rounded-lg 
           hover:bg-neutral-200 transition-colors duration-300"
         >
-          <h3 className="text-xl font-semibold mb-4">Sentiment Analysis</h3>
           <div className="w-full h-64">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>

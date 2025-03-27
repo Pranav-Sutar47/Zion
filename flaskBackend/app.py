@@ -10,6 +10,8 @@ import datetime
 from twitter_fetch import fetch_tweets
 from sentiment_analysis import analyze_sentiment
 from config import MONGO_URI, DB_NAME, COLLECTION_NAME
+import pickle
+from sklearn.feature_extraction.text import CountVectorizer
 
 app = Flask(__name__)
 CORS(app)
@@ -153,6 +155,40 @@ def tweet_sentiment_summary():
     except Exception as e:
         return jsonify({"error": f"Failed to fetch sentiment summary: {str(e)}"}), 500
 
+
+# Load the pickled model and vocabulary
+model = pickle.load(open('sentiment.pkl', 'rb'))
+vocabulary = pickle.load(open('vocabulary.pkl', 'rb'))
+
+def predict_sentiment(review):
+    # Vectorize the review using the loaded vocabulary
+    vectorizer = CountVectorizer(vocabulary=vocabulary)
+    review_vectorized = vectorizer.transform([review])
+    
+    # Predict the sentiment probability using the loaded model
+    sentiment_probability = model.predict_proba(review_vectorized)[0][1]
+    
+    return sentiment_probability
+
+@app.route('/evaluate-sentiment', methods=['POST'])
+def evaluate_sentiment():
+    # Get the request body as JSON
+    request_data = request.get_json()
+    
+    # Check if the request body contains the 'text' parameter
+    if 'text' not in request_data:
+        return jsonify({'error': 'Text parameter is missing'}), 400
+    
+    # Retrieve the text parameter from the request body
+    text = request_data['text']
+    
+    sentiment_probability = predict_sentiment(text)
+
+    # Perform sentiment analysis here (not implemented in this example)
+    # In this basic example, always return 'positive'
+    
+    # Return the response
+    return jsonify({'text' : text , 'sentiment': sentiment_probability})
 
 
 if __name__ == '__main__':

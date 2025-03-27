@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Loader from './Loader';
+import Analysis from './Analysis'
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -46,6 +47,9 @@ const Dashboard = () => {
       ) : error ? (
         <p className="text-red-500">{error}</p>
       ) : (
+        <>
+        <Analysis stats={stats}/>
+        <br/>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {cards.map((card, index) => (
             <div
@@ -62,8 +66,10 @@ const Dashboard = () => {
             </div>
           ))}
         </div>
+        </>
       )}
     </div>
+
   );
 };
 
