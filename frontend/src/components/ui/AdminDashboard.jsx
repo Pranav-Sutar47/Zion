@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import Analysis from './Analysis'
+import Analyzer from './Analyzer'
 import axios from 'axios'
 
 
@@ -77,7 +78,7 @@ const AdminDashboard = () => {
     },
     { 
       id: 'settings', 
-      label: 'Settings', 
+      label: 'Analyzer',
       icon: Icons.Settings,
       content: SettingsContent
     }
@@ -377,29 +378,7 @@ const UsersContent = () => {
 
 const SettingsContent = () => (
   <div>
-    <h2 className="text-3xl font-bold mb-6">Settings</h2>
-    <div className="bg-neutral-100 rounded-lg p-6">
-      <div className="mb-4">
-        <label className="block text-neutral-700 mb-2">Profile Settings</label>
-        <input 
-          type="text" 
-          placeholder="Name" 
-          className="w-full p-2 bg-white border border-neutral-300 rounded text-black 
-          focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-      <div className="mb-4">
-        <label className="block text-neutral-700 mb-2">Notification Preferences</label>
-        <div className="flex items-center">
-          <input 
-            type="checkbox" 
-            className="mr-2 bg-white text-blue-600 
-            focus:ring-blue-500 focus:ring-2 rounded" 
-          />
-          <span className="text-neutral-700">Enable Email Notifications</span>
-        </div>
-      </div>
-    </div>
+    <Analyzer/>
   </div>
 )
 
