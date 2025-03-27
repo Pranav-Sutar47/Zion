@@ -1,14 +1,18 @@
 import { useState } from 'react'
-
+import AdminDashboard from './components/ui/AdminDashboard'
+import LoginPage from './components/ui/Login'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
-    <>
-     <h1 className='text-[red] text-3xl'>hi</h1>
-    </>
+      <BrowserRouter>
+        <Routes>
+          {/* <Route path='/' element={<Navigate to={'/home'}/>}/> */}
+          <Route path='/' element={<LoginPage/>}/>
+          <Route path='/dashboard' element={<AdminDashboard/>}/>
+        </Routes>
+      </BrowserRouter>
   )
 }
-
-export default App
+export default App;

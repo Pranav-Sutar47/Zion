@@ -10,10 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tabler/icons-react": "^3.31.0",
     "clsx": "^2.1.1",
+    "framer-motion": "^12.6.2",
     "motion": "^12.6.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-router-dom": "^7.4.0",
+    "recharts": "^2.15.1",
     "tailwind-merge": "^3.0.2"
   },
   "devDependencies": {
