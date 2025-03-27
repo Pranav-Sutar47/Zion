@@ -4,8 +4,44 @@ const SentimentAnalyzer = () => {
   const [text, setText] = useState('');
   const [sentiment, setSentiment] = useState('');
   const [sentimentClass, setSentimentClass] = useState('');
+  const [result, setResult] = useState({ text: "", sentiment: "" });
+
+  
+  const getSentiment = (sentimentValue) => {
+    if (sentimentValue <= 0.5) {
+      return "Negative";
+    } else {
+      return "Positive";
+    }
+  };
+
+  const getProbability = (sentimentValue) => {
+    if (sentimentValue <= 0.5) {
+      sentimentValue = 0.5 - sentimentValue;
+      return sentimentValue*200;
+    } else {
+      return (sentimentValue-0.5)*200;
+    }
+  };
 
   const analyzeSentiment = () => {
+    console.log(text);
+
+    fetchRequest("post", "http://127.0.0.1:5000/evaluate-sentiment", {
+      text: text,
+    })
+      .then((responseData) => {
+        setResult({
+          text: text,
+          sentiment: getSentiment(responseData.sentiment),
+          probability: getProbability(responseData.sentiment)
+        });
+        console.log(responseData);
+      })
+      .catch((err) => {
+        alert(responseData["error"]);
+      });
+
     if (text.trim() === '') {
       setSentiment('Please enter some text.');
       setSentimentClass('bg-destructive/10 text-destructive');

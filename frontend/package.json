@@ -13,10 +13,7 @@
     "@radix-ui/react-toast": "^1.2.6",
     "@tabler/icons-react": "^3.31.0",
     "axios": "^1.8.4",
-<<<<<<< HEAD
     "class-variance-authority": "^0.7.1",
-=======
->>>>>>> 8849296f5207d16b2c11c729f0ab56c8baab9d1f
     "clsx": "^2.1.1",
     "framer-motion": "^12.6.2",
     "lucide-react": "^0.484.0",
