@@ -3,6 +3,8 @@ import Analysis from './Analysis'
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
 import Dashboard from './Dashboard';
+import Analyzer from './Analyzer'
+import axios from 'axios'
 
 
 // Custom SVG Icons (unchanged)
@@ -10,11 +12,6 @@ const Icons = {
   Dashboard: () => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
       <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
-    </svg>
-  ),
-  Analytics: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C6.375 19.496 5.871 20 5.25 20h-2.25A1.125 1.125 0 0 1 2 18.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125v-9.75ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v13.5c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125v-13.5Z" />
     </svg>
   ),
   Users: () => (
@@ -77,12 +74,6 @@ const AdminDashboard = () => {
       content: DashboardContent
     },
     { 
-      id: 'analytics', 
-      label: 'Analytics', 
-      icon: Icons.Analytics,
-      content: AnalyticsContent 
-    },
-    { 
       id: 'users', 
       label: 'Users', 
       icon: Icons.Users,
@@ -90,7 +81,7 @@ const AdminDashboard = () => {
     },
     { 
       id: 'settings', 
-      label: 'Settings', 
+      label: 'Analyzer',
       icon: Icons.Settings,
       content: SettingsContent
     }
@@ -177,101 +168,187 @@ const DashboardContent = () => (
     <Dashboard/>
 )
 
-const AnalyticsContent = () => (
-  <div>
-    <h2 className="text-3xl font-bold mb-6">Analytics Dashboard</h2>
-    <div className="grid grid-cols-2 gap-6">
-      {[
-        { 
-          title: 'User Growth', 
-          description: 'Monthly user acquisition trends' 
-        },
-        { 
-          title: 'Revenue Insights', 
-          description: 'Financial performance metrics' 
-        }
-      ].map((item, index) => (
-        <div 
-          key={index} 
-          className="bg-neutral-100 p-6 rounded-lg 
-          hover:bg-neutral-200 transition-colors duration-300"
-        >
-          <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
-          <p className="text-neutral-600">{item.description}</p>
-        </div>
-      ))}
-    </div>
-  </div>
-)
+// const AnalyticsContent = () => (
+//   <div>
+//     <Analysis/>
+//   </div>
+// )
 
 
-const UsersContent = () => (
-  <div>
-    <h2 className="text-3xl font-bold mb-6">User Management</h2>
-    <div className="bg-neutral-100 rounded-lg overflow-hidden">
-      <table className="w-full">
-        <thead className="bg-neutral-200">
-          <tr>
-            <th className="p-3 text-left text-neutral-700">Name</th>
-            <th className="p-3 text-left text-neutral-700">Email</th>
-            <th className="p-3 text-left text-neutral-700">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {[
-            { name: 'John Doe', email: 'john@example.com', status: 'Active' },
-            { name: 'Jane Smith', email: 'jane@example.com', status: 'Inactive' }
-          ].map((user, index) => (
-            <tr 
-              key={index} 
-              className="border-b border-neutral-200 
-              hover:bg-neutral-200 transition-colors duration-200"
+const UsersContent = () => {
+    const [formData, setFormData] = useState({
+      username: '',
+      email: '',
+      password: ''
+    })
+    const [admins, setAdmins] = useState([])
+    const [error, setError] = useState('')
+    const [success, setSuccess] = useState('')
+  
+    const handleInputChange = (e) => {
+      const { name, value } = e.target
+      setFormData(prevState => ({
+        ...prevState,
+        [name]: value
+      }))
+    }
+  
+    const handleCreateAdmin = async (e) => {
+      e.preventDefault()
+      setError('')
+      setSuccess('')
+  
+      try {
+        const response = await axios.post('/api/admins', formData)
+        setSuccess('Admin created successfully!')
+        // Reset form after successful creation
+        setFormData({
+          username: '',
+          email: '',
+          password: ''
+        })
+      } catch (err) {
+        setError('Failed to create admin. Please try again.')
+        console.error(err)
+      }
+    }
+  
+    const handleGetAdmins = async () => {
+      try {
+        const response = await axios.get('/api/admins')
+        setAdmins(response.data)
+      } catch (err) {
+        setError('Failed to fetch admins. Please try again.')
+        console.error(err)
+      }
+    }
+  
+    return (
+      <div>
+        <h2 className="text-3xl font-bold mb-6">Admin Management</h2>
+        
+        {/* Create Admin Form */}
+        <div className="bg-neutral-100 rounded-lg p-6 mb-6">
+          <h3 className="text-xl font-semibold mb-4">Create New Admin</h3>
+          <form onSubmit={handleCreateAdmin} className="space-y-4">
+            <div>
+              <label htmlFor="username" className="block text-neutral-700 mb-2">Username</label>
+              <input 
+                type="text" 
+                id="username"
+                name="username"
+                value={formData.username}
+                onChange={handleInputChange}
+                placeholder="Enter username" 
+                className="w-full p-2 bg-white border border-neutral-300 rounded 
+                focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="email" className="block text-neutral-700 mb-2">Email</label>
+              <input 
+                type="email" 
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                placeholder="Enter email" 
+                className="w-full p-2 bg-white border border-neutral-300 rounded 
+                focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="password" className="block text-neutral-700 mb-2">Password</label>
+              <input 
+                type="password" 
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                placeholder="Enter password" 
+                className="w-full p-2 bg-white border border-neutral-300 rounded 
+                focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+            
+            {error && (
+              <div className="bg-red-500/10 text-red-700 p-2 rounded">
+                {error}
+              </div>
+            )}
+            
+            {success && (
+              <div className="bg-green-500/10 text-green-700 p-2 rounded">
+                {success}
+              </div>
+            )}
+            
+            <button 
+              type="submit" 
+              className="w-full bg-blue-500 text-white p-2 rounded 
+              hover:bg-blue-600 transition-colors duration-300"
             >
-              <td className="p-3 text-neutral-800">{user.name}</td>
-              <td className="p-3 text-neutral-800">{user.email}</td>
-              <td className="p-3">
-                <span className={`
-                  px-2 py-1 rounded text-xs 
-                  ${user.status === 'Active' 
-                    ? 'bg-green-500/20 text-green-700' 
-                    : 'bg-red-500/20 text-red-700'}
-                `}>
-                  {user.status}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  </div>
-)
+              Create Admin
+            </button>
+          </form>
+        </div>
+        
+        {/* Get Admins Button and Table */}
+        <div>
+          <button 
+            onClick={handleGetAdmins}
+            className="mb-4 bg-green-500 text-white px-4 py-2 rounded 
+            hover:bg-green-600 transition-colors duration-300"
+          >
+            Get Admins
+          </button>
+  
+          {admins.length > 0 && (
+            <div className="bg-neutral-100 rounded-lg overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-neutral-200">
+                  <tr>
+                    <th className="p-3 text-left text-neutral-700">Username</th>
+                    <th className="p-3 text-left text-neutral-700">Email</th>
+                    <th className="p-3 text-left text-neutral-700">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {admins.map((admin, index) => (
+                    <tr 
+                      key={index} 
+                      className="border-b border-neutral-200 
+                      hover:bg-neutral-200 transition-colors duration-200"
+                    >
+                      <td className="p-3 text-neutral-800">{admin.username}</td>
+                      <td className="p-3 text-neutral-800">{admin.email}</td>
+                      <td className="p-3">
+                        <span className={`
+                          px-2 py-1 rounded text-xs 
+                          ${admin.status === 'Active' 
+                            ? 'bg-green-500/20 text-green-700' 
+                            : 'bg-red-500/20 text-red-700'}
+                        `}>
+                          {admin.status || 'Active'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
 
 const SettingsContent = () => (
   <div>
-    <h2 className="text-3xl font-bold mb-6">Settings</h2>
-    <div className="bg-neutral-100 rounded-lg p-6">
-      <div className="mb-4">
-        <label className="block text-neutral-700 mb-2">Profile Settings</label>
-        <input 
-          type="text" 
-          placeholder="Name" 
-          className="w-full p-2 bg-white border border-neutral-300 rounded text-black 
-          focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-      <div className="mb-4">
-        <label className="block text-neutral-700 mb-2">Notification Preferences</label>
-        <div className="flex items-center">
-          <input 
-            type="checkbox" 
-            className="mr-2 bg-white text-blue-600 
-            focus:ring-blue-500 focus:ring-2 rounded" 
-          />
-          <span className="text-neutral-700">Enable Email Notifications</span>
-        </div>
-      </div>
-    </div>
+    <Analyzer/>
   </div>
 )
 
