@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import Analysis from './Analysis'
+import axios from 'axios'
+
 
 // Custom SVG Icons (unchanged)
 const Icons = {
@@ -197,73 +199,181 @@ const DashboardContent = () => (
 
 const AnalyticsContent = () => (
   <div>
-    <h2 className="text-3xl font-bold mb-6">Analytics Dashboard</h2>
-    <div className="grid grid-cols-2 gap-6">
-      {[
-        { 
-          title: 'User Growth', 
-          description: 'Monthly user acquisition trends' 
-        },
-        { 
-          title: 'Revenue Insights', 
-          description: 'Financial performance metrics' 
-        }
-      ].map((item, index) => (
-        <div 
-          key={index} 
-          className="bg-neutral-100 p-6 rounded-lg 
-          hover:bg-neutral-200 transition-colors duration-300"
-        >
-          <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
-          <p className="text-neutral-600">{item.description}</p>
-        </div>
-      ))}
-    </div>
+    <Analysis/>
   </div>
 )
 
 
-const UsersContent = () => (
-  <div>
-    <h2 className="text-3xl font-bold mb-6">User Management</h2>
-    <div className="bg-neutral-100 rounded-lg overflow-hidden">
-      <table className="w-full">
-        <thead className="bg-neutral-200">
-          <tr>
-            <th className="p-3 text-left text-neutral-700">Name</th>
-            <th className="p-3 text-left text-neutral-700">Email</th>
-            <th className="p-3 text-left text-neutral-700">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {[
-            { name: 'John Doe', email: 'john@example.com', status: 'Active' },
-            { name: 'Jane Smith', email: 'jane@example.com', status: 'Inactive' }
-          ].map((user, index) => (
-            <tr 
-              key={index} 
-              className="border-b border-neutral-200 
-              hover:bg-neutral-200 transition-colors duration-200"
+const UsersContent = () => {
+    const [formData, setFormData] = useState({
+      username: '',
+      email: '',
+      password: ''
+    })
+    const [admins, setAdmins] = useState([])
+    const [error, setError] = useState('')
+    const [success, setSuccess] = useState('')
+  
+    const handleInputChange = (e) => {
+      const { name, value } = e.target
+      setFormData(prevState => ({
+        ...prevState,
+        [name]: value
+      }))
+    }
+  
+    const handleCreateAdmin = async (e) => {
+      e.preventDefault()
+      setError('')
+      setSuccess('')
+  
+      try {
+        const response = await axios.post('/api/admins', formData)
+        setSuccess('Admin created successfully!')
+        // Reset form after successful creation
+        setFormData({
+          username: '',
+          email: '',
+          password: ''
+        })
+      } catch (err) {
+        setError('Failed to create admin. Please try again.')
+        console.error(err)
+      }
+    }
+  
+    const handleGetAdmins = async () => {
+      try {
+        const response = await axios.get('/api/admins')
+        setAdmins(response.data)
+      } catch (err) {
+        setError('Failed to fetch admins. Please try again.')
+        console.error(err)
+      }
+    }
+  
+    return (
+      <div>
+        <h2 className="text-3xl font-bold mb-6">Admin Management</h2>
+        
+        {/* Create Admin Form */}
+        <div className="bg-neutral-100 rounded-lg p-6 mb-6">
+          <h3 className="text-xl font-semibold mb-4">Create New Admin</h3>
+          <form onSubmit={handleCreateAdmin} className="space-y-4">
+            <div>
+              <label htmlFor="username" className="block text-neutral-700 mb-2">Username</label>
+              <input 
+                type="text" 
+                id="username"
+                name="username"
+                value={formData.username}
+                onChange={handleInputChange}
+                placeholder="Enter username" 
+                className="w-full p-2 bg-white border border-neutral-300 rounded 
+                focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="email" className="block text-neutral-700 mb-2">Email</label>
+              <input 
+                type="email" 
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                placeholder="Enter email" 
+                className="w-full p-2 bg-white border border-neutral-300 rounded 
+                focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="password" className="block text-neutral-700 mb-2">Password</label>
+              <input 
+                type="password" 
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                placeholder="Enter password" 
+                className="w-full p-2 bg-white border border-neutral-300 rounded 
+                focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+            
+            {error && (
+              <div className="bg-red-500/10 text-red-700 p-2 rounded">
+                {error}
+              </div>
+            )}
+            
+            {success && (
+              <div className="bg-green-500/10 text-green-700 p-2 rounded">
+                {success}
+              </div>
+            )}
+            
+            <button 
+              type="submit" 
+              className="w-full bg-blue-500 text-white p-2 rounded 
+              hover:bg-blue-600 transition-colors duration-300"
             >
-              <td className="p-3 text-neutral-800">{user.name}</td>
-              <td className="p-3 text-neutral-800">{user.email}</td>
-              <td className="p-3">
-                <span className={`
-                  px-2 py-1 rounded text-xs 
-                  ${user.status === 'Active' 
-                    ? 'bg-green-500/20 text-green-700' 
-                    : 'bg-red-500/20 text-red-700'}
-                `}>
-                  {user.status}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  </div>
-)
+              Create Admin
+            </button>
+          </form>
+        </div>
+        
+        {/* Get Admins Button and Table */}
+        <div>
+          <button 
+            onClick={handleGetAdmins}
+            className="mb-4 bg-green-500 text-white px-4 py-2 rounded 
+            hover:bg-green-600 transition-colors duration-300"
+          >
+            Get Admins
+          </button>
+  
+          {admins.length > 0 && (
+            <div className="bg-neutral-100 rounded-lg overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-neutral-200">
+                  <tr>
+                    <th className="p-3 text-left text-neutral-700">Username</th>
+                    <th className="p-3 text-left text-neutral-700">Email</th>
+                    <th className="p-3 text-left text-neutral-700">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {admins.map((admin, index) => (
+                    <tr 
+                      key={index} 
+                      className="border-b border-neutral-200 
+                      hover:bg-neutral-200 transition-colors duration-200"
+                    >
+                      <td className="p-3 text-neutral-800">{admin.username}</td>
+                      <td className="p-3 text-neutral-800">{admin.email}</td>
+                      <td className="p-3">
+                        <span className={`
+                          px-2 py-1 rounded text-xs 
+                          ${admin.status === 'Active' 
+                            ? 'bg-green-500/20 text-green-700' 
+                            : 'bg-red-500/20 text-red-700'}
+                        `}>
+                          {admin.status || 'Active'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
 
 const SettingsContent = () => (
   <div>
