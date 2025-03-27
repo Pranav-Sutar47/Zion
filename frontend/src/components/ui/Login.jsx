@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate from React Router DOM
+import { useToast } from "@/hooks/use-toast";
+import { Loader } from 'lucide-react';
+import axios from 'axios';
 
 const LoginPage = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [load,setLoad] = useState(false);
   
   const navigate = useNavigate(); // Initialize the navigate hook
+  const { toast } = useToast();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
+
     e.preventDefault();
 
     // Basic validation
@@ -17,23 +23,40 @@ const LoginPage = ({ onLogin }) => {
       return;
     }
 
-    // Simple mock authentication 
-    // In a real app, this would be replaced with actual authentication logic
-    if (email === 'admin@example.com' && password === 'password123') {
-      // Mock token (you would typically get this from a real API)
-      const token = 'mock-token-12345'; 
-      
-      // Save the token to localStorage
-      localStorage.setItem('authToken', token);
-      
-      // Trigger the onLogin callback with true (you can modify this to handle user state in a parent component)
-      onLogin(true);
-      
-      // Redirect the user to the Dashboard
-      navigate('/dashboard');
-    } else {
-      setError('Invalid email or password');
+    try {
+      setLoad(true);
+      const url = String(import.meta.env.VITE_BASEURL)+'/login';
+      const response = await axios.post(url, {
+        email,
+        password,
+      });
+
+      if (response.status === 200) {
+        localStorage.setItem("token", response.data.token); // Store token
+        toast({
+          description: "User Logged In Successfully!",
+          className: "bg-green-500 text-white",
+        });
+        navigate('/dashboard');
+        setLoad(false);
+      }else{
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Something went wrong.",
+          description: "There was a problem with your request.",
+        });
+      }
+    } catch (error) {
+      console.error('Error at login',error);
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem with your request.",
+      });
+    }finally{
+      setLoad(false);
     }
+    
   };
 
   return (
@@ -94,7 +117,9 @@ const LoginPage = ({ onLogin }) => {
             hover:bg-blue-600 transition-colors duration-300 
             flex items-center justify-center space-x-2"
           >
-            <span>Login</span>
+            {
+              load ? <Loader/> : <span>Login</span>
+            }
           </button>
         </form>
         

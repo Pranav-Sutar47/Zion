@@ -1,5 +1,8 @@
 import React, { useState } from 'react'
 import Analysis from './Analysis'
+import { useNavigate } from 'react-router-dom';
+import { useToast } from "@/hooks/use-toast";
+import Dashboard from './Dashboard';
 import Analyzer from './Analyzer'
 import axios from 'axios'
 
@@ -9,11 +12,6 @@ const Icons = {
   Dashboard: () => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
       <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
-    </svg>
-  ),
-  Analytics: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C6.375 19.496 5.871 20 5.25 20h-2.25A1.125 1.125 0 0 1 2 18.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125v-9.75ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v13.5c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125v-13.5Z" />
     </svg>
   ),
   Users: () => (
@@ -56,6 +54,17 @@ const Tooltip = ({ children, text }) => {
 const AdminDashboard = () => {
   const [isHovered, setIsHovered] = useState(false)
   const [activeSection, setActiveSection] = useState('dashboard')
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleLogOut = () => {
+    localStorage.clear();
+    toast({
+      description: "User Logged Out Successfully!",
+      className: "bg-green-500 text-white",
+    });
+    navigate("/");
+  };
 
   const sidebarItems = [
     { 
@@ -63,12 +72,6 @@ const AdminDashboard = () => {
       label: 'Dashboard', 
       icon: Icons.Dashboard,
       content: DashboardContent
-    },
-    { 
-      id: 'analytics', 
-      label: 'Analytics', 
-      icon: Icons.Analytics,
-      content: AnalyticsContent 
     },
     { 
       id: 'users', 
@@ -137,6 +140,7 @@ const AdminDashboard = () => {
           
           <Tooltip text="Logout">
             <div
+              onClick={handleLogOut}
               className={`
                 w-full flex items-center 
                 ${isHovered ? 'px-5' : 'justify-center'}
@@ -161,48 +165,14 @@ const AdminDashboard = () => {
 }
 
 const DashboardContent = () => (
-  <div>
-    <h2 className="text-3xl font-bold mb-6">Dashboard Overview</h2>
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {[
-        { 
-          title: 'Total Users', 
-          value: '1,234', 
-          className: 'bg-blue-500/10 text-blue-600' 
-        },
-        { 
-          title: 'Active Users', 
-          value: '456', 
-          className: 'bg-green-500/10 text-green-600' 
-        },
-        { 
-          title: 'Pending Requests', 
-          value: '78', 
-          className: 'bg-yellow-500/10 text-yellow-600' 
-        }
-      ].map((card, index) => (
-        <div 
-          key={index} 
-          className={`
-            p-6 rounded-lg shadow-lg 
-            ${card.className}
-            transform transition-transform duration-300 
-            hover:scale-105
-          `}
-        >
-          <h3 className="text-lg font-semibold">{card.title}</h3>
-          <p className="text-3xl font-bold mt-2">{card.value}</p>
-        </div>
-      ))}
-    </div>
-  </div>
+    <Dashboard/>
 )
 
-const AnalyticsContent = () => (
-  <div>
-    <Analysis/>
-  </div>
-)
+// const AnalyticsContent = () => (
+//   <div>
+//     <Analysis/>
+//   </div>
+// )
 
 
 const UsersContent = () => {
