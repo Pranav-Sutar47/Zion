@@ -1,5 +1,9 @@
 import React, { useState } from 'react'
 import Analysis from './Analysis'
+import { useNavigate } from 'react-router-dom';
+import { useToast } from "@/hooks/use-toast";
+import Dashboard from './Dashboard';
+
 
 // Custom SVG Icons (unchanged)
 const Icons = {
@@ -53,6 +57,17 @@ const Tooltip = ({ children, text }) => {
 const AdminDashboard = () => {
   const [isHovered, setIsHovered] = useState(false)
   const [activeSection, setActiveSection] = useState('dashboard')
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleLogOut = () => {
+    localStorage.clear();
+    toast({
+      description: "User Logged Out Successfully!",
+      className: "bg-green-500 text-white",
+    });
+    navigate("/");
+  };
 
   const sidebarItems = [
     { 
@@ -134,6 +149,7 @@ const AdminDashboard = () => {
           
           <Tooltip text="Logout">
             <div
+              onClick={handleLogOut}
               className={`
                 w-full flex items-center 
                 ${isHovered ? 'px-5' : 'justify-center'}
@@ -158,41 +174,7 @@ const AdminDashboard = () => {
 }
 
 const DashboardContent = () => (
-  <div>
-    <h2 className="text-3xl font-bold mb-6">Dashboard Overview</h2>
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {[
-        { 
-          title: 'Total Users', 
-          value: '1,234', 
-          className: 'bg-blue-500/10 text-blue-600' 
-        },
-        { 
-          title: 'Active Users', 
-          value: '456', 
-          className: 'bg-green-500/10 text-green-600' 
-        },
-        { 
-          title: 'Pending Requests', 
-          value: '78', 
-          className: 'bg-yellow-500/10 text-yellow-600' 
-        }
-      ].map((card, index) => (
-        <div 
-          key={index} 
-          className={`
-            p-6 rounded-lg shadow-lg 
-            ${card.className}
-            transform transition-transform duration-300 
-            hover:scale-105
-          `}
-        >
-          <h3 className="text-lg font-semibold">{card.title}</h3>
-          <p className="text-3xl font-bold mt-2">{card.value}</p>
-        </div>
-      ))}
-    </div>
-  </div>
+    <Dashboard/>
 )
 
 const AnalyticsContent = () => (
