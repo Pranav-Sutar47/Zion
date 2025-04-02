@@ -110,8 +110,8 @@ const AdminDashboard = () => {
           {sidebarItems.map((item) => {
             const Icon = item.icon
             return (
-              <Tooltip key={item.id} text={item.label}>
-                <div
+              // <Tooltip key={item.id} text={item.label}>
+                <div key={item.id}
                   onClick={() => setActiveSection(item.id)}
                   className={`
                     w-full flex items-center px-5 py-3 text-left 
@@ -133,11 +133,11 @@ const AdminDashboard = () => {
                     <span className="ml-3">{item.label}</span>
                   )}
                 </div>
-              </Tooltip>
+              // </Tooltip>
             )
           })}
           
-          <Tooltip text="Logout">
+          {/* <Tooltip text="Logout"> */}
             <div
               onClick={handleLogOut}
               className={`
@@ -152,7 +152,7 @@ const AdminDashboard = () => {
                 <span className="ml-3">Logout</span>
               )}
             </div>
-          </Tooltip>
+          {/* </Tooltip> */}
         </nav>
       </div>
 
@@ -305,13 +305,13 @@ const UsersContent = () => {
         
         {/* Get Admins Button and Table */}
         <div>
-          <button 
+          {/* <button 
             onClick={handleGetAdmins}
             className="mb-4 bg-green-500 text-white px-4 py-2 rounded 
             hover:bg-green-600 transition-colors duration-300"
           >
             Get Admins
-          </button>
+          </button> */}
   
           {admins.length > 0 && (
             <div className="bg-neutral-100 rounded-lg overflow-hidden">

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import fetchRequest from "../../utils/apiCall";
 
 const SentimentAnalyzer = () => {
   const [text, setText] = useState('');
@@ -6,7 +7,7 @@ const SentimentAnalyzer = () => {
   const [sentimentClass, setSentimentClass] = useState('');
   const [result, setResult] = useState({ text: "", sentiment: "" });
 
-  
+
   const getSentiment = (sentimentValue) => {
     if (sentimentValue <= 0.5) {
       return "Negative";
@@ -36,7 +37,6 @@ const SentimentAnalyzer = () => {
           sentiment: getSentiment(responseData.sentiment),
           probability: getProbability(responseData.sentiment)
         });
-        console.log(responseData);
       })
       .catch((err) => {
         alert(responseData["error"]);

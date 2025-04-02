@@ -7,3 +7,12 @@ ACCESS_TOKEN_SECRET = sU8KJJx2liXkacYgsy2mKtX7On5jxPRO74EQwWc9AeMir
 dbpsw = sentiment123
 
 AAAAAAAAAAAAAAAAAAAAAOPU0AEAAAAA8SPQsV1oYc2YS2HS%2BIsSaNyTfY4%3DUAGbLIXLCU2dU0GRdFkHzQF6T13VEKJb660qJbP2UbYaUGtIrB
+
+
+
+
+Todays enviroment seems good to take a stroll
+
+
+Bath Size
+Excel 

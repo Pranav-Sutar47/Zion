@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
 const AnalyticsContent = ({stats}) => {
-
-  console.log(stats);
   // State to store sentiment data
   const [sentimentData, setSentimentData] = useState([
     { name: 'Positive', value:stats.positive, color: '#10B981' },
@@ -19,39 +17,36 @@ const AnalyticsContent = ({stats}) => {
   })
 
   // Simulated API call (replace with actual API fetch)
+  const calculateAverageSentiment = (data) => {
+    const positive = data.find(item => item.name === 'Positive')?.value || 0;
+    const negative = data.find(item => item.name === 'Negative')?.value || 0;
+    const total = data.reduce((sum, item) => sum + item.value, 0);
+
+    if (total === 0) return 0; // Avoid division by zero
+
+    return ((positive - negative) / total * 100).toFixed(2);
+  };
+
   useEffect(() => {
     const fetchSentimentData = async () => {
       try {
-        const total = sentimentData.reduce((sum, item) => sum + item.value, 0)
-        const mostFrequent = sentimentData.reduce((prev, current) => 
-          (prev.value > current.value) ? prev : current
-        )
+        const total = sentimentData.reduce((sum, item) => sum + item.value, 0);
+        const mostFrequent = sentimentData.reduce((prev, current) =>
+          prev.value > current.value ? prev : current
+        );
 
         setMetrics({
           totalReviews: total,
           averageSentiment: calculateAverageSentiment(sentimentData),
           mostFrequentSentiment: mostFrequent.name
-        })
+        });
       } catch (error) {
-        console.error('Error fetching sentiment data:', error)
+        console.error('Error fetching sentiment data:', error);
       }
-    }
+    };
 
-    fetchSentimentData()
-  }, [sentimentData])
-
-  // Calculate weighted average sentiment
-  const calculateAverageSentiment = (data) => {
-    const sentimentWeights = { 
-      'Negative': 1, 
-      'Neutral': 2, 
-      'Positive': 3 
-    }
-    const weightedSum = data.reduce((sum, item) => 
-      sum + (item.value * sentimentWeights[item.name]), 0)
-    const totalValue = data.reduce((sum, item) => sum + item.value, 0)
-    return ((weightedSum / totalValue) * 100).toFixed(2)
-  }
+    fetchSentimentData();
+  }, [stats]);
 
   return (
     <div>
